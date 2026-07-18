@@ -3,11 +3,11 @@ import { AppLayout } from '../../../layouts/app-layout'
 import { Input } from '../../../components/ui/input'
 import { Button } from '../../../components/ui/button'
 import {
-    Search, Plus
+    Search, Plus, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { TransactionData, TransactionModal } from '../components/transaction-modal'
 import { useMutation, useQuery } from '@apollo/client/react'
-import { Category, Transaction } from '@/types'
+import { Category, Transaction, TransactionResult } from '@/types'
 import { LIST_CATEGORIES } from '@/lib/graphql/queries/Category'
 import { LIST_TRANSACTIONS } from '@/lib/graphql/queries/Transactions'
 import { TransactionRow } from '../components/transaction-row'
@@ -27,21 +27,34 @@ export function Transactions() {
     const [debouncedSearch, setDebouncedSearch] = useState('')
     const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null)
 
+    const ITEMS_PER_PAGE = 5
+
     const categoriesResult = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES)
-    const transactonsResult = useQuery<{ listTransactions: Transaction[] }>(LIST_TRANSACTIONS, {
+    const transactonsResult = useQuery<{ listTransactions: TransactionResult }>(LIST_TRANSACTIONS, {
         variables: {
             filters: {
                 categoryId: category == 'all' ? undefined : category,
                 transactionType: type == 'all' ? undefined : type,
                 description: debouncedSearch == 'all' ? undefined : debouncedSearch,
                 period: period == '' ? undefined : period
-            }
+            },
+            page: currentPage,
+            limit: ITEMS_PER_PAGE
         },
         fetchPolicy: 'cache-and-network',
     })
 
-    const transactions = transactonsResult.data?.listTransactions || []
+    const transactions = transactonsResult.data?.listTransactions.data || []
+    const totalItems = transactonsResult.data?.listTransactions.total || 0
     const categories = categoriesResult.data?.listCategories || []
+
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE)
+    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1
+    const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems)
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [debouncedSearch, type, category, period])
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -196,31 +209,49 @@ export function Transactions() {
                         </table>
                     </div>
 
-                    {/* <div className="flex flex-col sm:flex-row items-center justify-between p-6 border-t border-gray-100 gap-4">
-                        <span className="text-sm text-gray-500 font-medium">
-                            1 a 10 <span className="text-gray-300 mx-1">|</span> 27 resultados
-                        </span>
+                    {/* 3. Paginação Renderizada Dinamicamente */}
+                    {totalPages > 1 && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between p-6 border-t border-gray-100 gap-4">
+                            <span className="text-sm text-gray-500 font-medium">
+                                {startItem} a {endItem} <span className="text-gray-300 mx-1">|</span> {totalItems} resultados
+                            </span>
 
-                        <div className="flex items-center gap-1.5">
-                            <button className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
-                                <ChevronLeft className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
 
-                            <button className="w-8 h-8 rounded-lg bg-[#1b623b] text-white text-sm font-bold flex items-center justify-center transition-all">
-                                1
-                            </button>
-                            <button className="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-50 text-sm font-semibold flex items-center justify-center transition-all border border-gray-200">
-                                2
-                            </button>
-                            <button className="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-50 text-sm font-semibold flex items-center justify-center transition-all border border-gray-200">
-                                3
-                            </button>
+                                {Array.from({ length: totalPages }, (_, index) => {
+                                    const pageNumber = index + 1;
+                                    const isCurrent = pageNumber === currentPage;
+                                    return (
+                                        <button
+                                            key={pageNumber}
+                                            onClick={() => setCurrentPage(pageNumber)}
+                                            className={`w-8 h-8 rounded-lg text-sm font-bold flex items-center justify-center transition-all border ${isCurrent
+                                                ? "bg-[#1b623b] text-white border-transparent"
+                                                : "text-gray-500 hover:bg-gray-50 border-gray-200"
+                                                }`}
+                                        >
+                                            {pageNumber}
+                                        </button>
+                                    )
+                                })}
 
-                            <button className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
-                                <ChevronRight className="w-4 h-4" />
-                            </button>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
-                    </div> */}
+                    )}
 
                 </div>
 

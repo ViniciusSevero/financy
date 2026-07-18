@@ -64,7 +64,7 @@ export class DashboardResolver {
             monthlyIncome,
             monthlyOutcome,
             totalCategories,
-            totalTransactions: allTransactions.length,
+            totalTransactions: allTransactions.data.length,
             mostUsedCategory
         };
     }

@@ -43,7 +43,7 @@ export class TransactionService {
         })
     }
 
-    async listTransactions(userId: string, filters?: TransactionFiltersInput, limit?: number) {
+    async listTransactions(userId: string, filters?: TransactionFiltersInput, limit?: number, page?: number) {
 
         const whereClause: Prisma.TransactionWhereInput = {
             userId,
@@ -81,13 +81,28 @@ export class TransactionService {
             }
         }
 
-        return await prismaClient.transaction.findMany({
-            where: whereClause,
-            orderBy: {
-                transactionDate: "desc",
-            },
-            ...(limit && { take: limit })
-        });
+        let skip = undefined
+        if (page) {
+            skip = (page - 1) * limit
+        }
+
+        const [data, total] = await prismaClient.$transaction([
+            prismaClient.transaction.findMany({
+                where: whereClause,
+                orderBy: {
+                    transactionDate: "desc",
+                },
+                ...(limit && { take: limit }),
+                ...(skip && { skip: skip })
+            }), prismaClient.transaction.count({
+                where: whereClause,
+            })
+        ])
+
+        return {
+            data,
+            total
+        }
     }
 
 

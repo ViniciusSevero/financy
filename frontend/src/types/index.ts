@@ -63,3 +63,8 @@ export interface Transaction {
     createdAt: Date
     updatedAt: Date
 }
+
+export interface TransactionResult {
+    data: Transaction[]
+    total: number
+}

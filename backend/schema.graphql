@@ -90,7 +90,10 @@ type Query {
 
     """Quantidade máxima de registros a retornar"""
     limit: Int
-  ): [TransactionModel!]!
+
+    """Pagina solicitada"""
+    page: Int
+  ): TransactionResult!
 }
 
 input RegisterInput {
@@ -126,6 +129,11 @@ type TransactionModel {
   updatedAt: DateTimeISO!
   user: UserModel
   userId: String!
+}
+
+type TransactionResult {
+  data: [TransactionModel!]!
+  total: Int!
 }
 
 """Transaction Type"""

@@ -1,4 +1,4 @@
-import { Field, Float, GraphQLISODateTime, ID, ObjectType, registerEnumType } from 'type-graphql'
+import { Field, Float, GraphQLISODateTime, ID, Int, ObjectType, registerEnumType } from 'type-graphql'
 import { UserModel } from './user.model'
 import { CategoryModel } from './category.model'
 import { LocalDateScalar } from '../graphql/decorators/LocalDateScalar'
@@ -48,4 +48,13 @@ export class TransactionModel {
 
     @Field(() => GraphQLISODateTime)
     updatedAt!: Date
+}
+
+@ObjectType()
+export class TransactionResult {
+    @Field(() => [TransactionModel])
+    data: TransactionModel[]
+
+    @Field(() => Int)
+    total: number
 }

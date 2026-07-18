@@ -5,7 +5,7 @@ import { UserModel } from '../models/user.model'
 import { UserService } from '../services/user.service'
 import { IsAuth } from '../middlewares/auth.middleware'
 import { TransactionService } from '../services/transaction.service'
-import { TransactionModel } from '../models/transaction.model'
+import { TransactionModel, TransactionResult } from '../models/transaction.model'
 import { CreateTransactionInput, TransactionFiltersInput, UpdateTransactionInput } from '../dtos/input/transaction.input'
 import { CategoryModel } from '../models/category.model'
 import { CategoryService } from '../services/category.service'
@@ -43,13 +43,14 @@ export class TransactionResolver {
     return true
   }
 
-  @Query(() => [TransactionModel])
+  @Query(() => TransactionResult)
   async listTransactions(
     @GqlUser() user: UserModel,
     @Arg("filters", () => TransactionFiltersInput, { nullable: true }) filters?: TransactionFiltersInput,
-    @Arg("limit", () => Int, { nullable: true, description: "Quantidade máxima de registros a retornar" }) limit?: number
-  ): Promise<TransactionModel[]> {
-    return this.transactionService.listTransactions(user.id, filters, limit)
+    @Arg("limit", () => Int, { nullable: true, description: "Quantidade máxima de registros a retornar" }) limit?: number,
+    @Arg("page", () => Int, { nullable: true, description: "Pagina solicitada" }) page?: number
+  ): Promise<TransactionResult> {
+    return await this.transactionService.listTransactions(user.id, filters, limit, page)
   }
 
   @Query(() => TransactionModel)
