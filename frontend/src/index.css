@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Fundo da tela em um tom off-white suave */
+    --background: 210 20% 98%; /* #f8f9fa ou similar */
+    --foreground: 222.2 84% 4.9%;
+
+    /* Card centralizado (Branco puro) */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    /* Cor Principal (Verde Floresta do Financy) */
+    --primary: 154 54% 24%; /* #1b623b ou #1b5e3a aproximadamente */
+    --primary-foreground: 210 20% 98%;
+
+    /* Outros componentes do design */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 88%;
+    --ring: 154 54% 24%;
+
+    --radius: 0.75rem; /* Bordas levemente mais arredondadas como na imagem (12px) */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#f9fafb] text-foreground antialiased font-sans;
+  }
+}
