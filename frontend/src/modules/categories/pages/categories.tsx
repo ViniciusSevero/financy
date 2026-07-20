@@ -99,10 +99,10 @@ export function Categories() {
                         iconColor={"text-purple-600 bg-purple-50"}
                     />
                     <SummaryCard
-                        icon={getCategoryIcon(dashboardStats?.mostUsedCategory.icon || '')}
-                        value={dashboardStats?.mostUsedCategory.title || ''}
+                        icon={getCategoryIcon(dashboardStats?.mostUsedCategory?.icon || '')}
+                        value={dashboardStats?.mostUsedCategory?.title || ''}
                         label="Categoria mais utilizada"
-                        iconColor={dashboardStats?.mostUsedCategory.color || 'blue'}
+                        iconColor={dashboardStats?.mostUsedCategory?.color || 'blue'}
                     />
                 </div>
 

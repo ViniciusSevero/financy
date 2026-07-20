@@ -7,7 +7,7 @@ import {
 import { Button } from '../../../components/ui/button'
 import { TransactionModal } from '@/modules/transactions/components/transaction-modal'
 import { useQuery } from '@apollo/client/react'
-import { Category, DashboardStats, Transaction } from '@/types'
+import { Category, DashboardStats, Transaction, TransactionResult } from '@/types'
 import { GET_DASHBOARD_STATS } from '@/lib/graphql/queries/Dashboard'
 import { LIST_TRANSACTIONS } from '@/lib/graphql/queries/Transactions'
 import { TransactionRow } from '../components/transaction-row'
@@ -22,7 +22,7 @@ export function Dashboard() {
 
     const dashboardResult = useQuery<{ getDashboardStats: DashboardStats }>(GET_DASHBOARD_STATS)
     const categoriesResult = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES)
-    const transactonsResult = useQuery<{ listTransactions: Transaction[] }>(LIST_TRANSACTIONS, {
+    const transactonsResult = useQuery<{ listTransactions: TransactionResult }>(LIST_TRANSACTIONS, {
         variables: {
             limit: 5
         },
@@ -30,7 +30,7 @@ export function Dashboard() {
     })
 
     const dashboardStats = dashboardResult.data?.getDashboardStats
-    const recentTransactions = transactonsResult.data?.listTransactions || []
+    const recentTransactions = transactonsResult.data?.listTransactions.data || []
     const categories = categoriesResult.data?.listCategories || []
 
     const getPillCategoryColor = (color: CategoryColor) => {
